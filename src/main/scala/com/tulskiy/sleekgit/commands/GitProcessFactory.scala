@@ -1,4 +1,4 @@
-package com.tulskiy.sleekgit
+package com.tulskiy.sleekgit.commands
 
 import org.apache.sshd.common.Factory
 import org.apache.sshd.server.Command
