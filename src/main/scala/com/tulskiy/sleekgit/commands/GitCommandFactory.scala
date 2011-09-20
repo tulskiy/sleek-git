@@ -1,8 +1,8 @@
 package com.tulskiy.sleekgit.commands
 
-import org.eclipse.jgit.lib.RepositoryBuilder
-import org.apache.sshd.server.{Environment, CommandFactory}
+import org.apache.sshd.server.{CommandFactory}
 import java.io.{PrintWriter, File}
+import org.eclipse.jgit.lib.{Repository, RepositoryBuilder}
 
 /**
  * Author: Denis Tulskiy
@@ -28,20 +28,28 @@ class GitCommandFactory extends CommandFactory {
     null
   }
 
-  def createCommand(input: String) = input match {
-    case GitCommandFactory.GitUploadPackRE(path) => new UploadPackCommand(null)
-    case GitCommandFactory.GitReceivePackRE(path) => new UploadPackCommand(null)
-    case _ => new InvalidCommand(input)
+  def createCommand(input: String) = {
+    try {
+      input match {
+        case GitCommandFactory.GitUploadPackRE(path) => new UploadPackCommand(buildRepository(path))
+        case GitCommandFactory.GitReceivePackRE(path) => new ReceivePackCommand(null)
+      }
+    } catch {
+      case e: MatchError => {
+        new OutputErrorCommand("Invalid git command: " + input)
+      }
+      case e: InvalidRepositoryException => {
+        new OutputErrorCommand(e.getMessage)
+      }
+    }
   }
 
-  class InvalidCommand(input: String) extends GitCommand(null) {
-    def start(env: Environment) {
-      err.write(String.format("Invalid command: %s. Only git commands are supported.", input).getBytes)
-      err.flush()
-      exitCallback.onExit(0)
-    }
-
-    def destroy() {
-    }
+  def buildRepository(path: String): Repository = {
+    val baseDir = new File(path)
+    val gitDir = new File(baseDir, ".git")
+    null
   }
+
+  class InvalidRepositoryException(message: String) extends RuntimeException(message)
+
 }
