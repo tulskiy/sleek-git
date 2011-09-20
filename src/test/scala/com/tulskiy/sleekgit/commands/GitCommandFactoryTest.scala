@@ -28,6 +28,7 @@ class GitCommandFactoryTest extends Specification {
       "git-upload-pack '~user/../test.git'" must not(matchUpload)
       "git-upload-pack '~user/test.git/./wdr'" must not(matchUpload)
       "git-upload-pack '~user/test.git/../wdr'" must not(matchUpload)
+      "git-upload-pack ''" must not(matchUpload)
     }
   }
 
