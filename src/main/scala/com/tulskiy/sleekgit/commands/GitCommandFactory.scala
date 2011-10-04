@@ -1,8 +1,8 @@
 package com.tulskiy.sleekgit.commands
 
 import org.apache.sshd.server.{CommandFactory}
-import java.io.{PrintWriter, File}
-import org.eclipse.jgit.lib.{Repository, RepositoryBuilder}
+import org.eclipse.jgit.lib.{RepositoryBuilder, Repository}
+import java.io.{IOException, File}
 
 /**
  * Author: Denis Tulskiy
@@ -18,38 +18,39 @@ object GitCommandFactory {
 }
 
 class GitCommandFactory extends CommandFactory {
-  def create(command: String, args: String): GitCommand = {
-    val builder = new RepositoryBuilder();
-    val repository = builder.setGitDir(new File(args))
-      .readEnvironment() // scan environment GIT_* variables
-      .findGitDir() // scan up the file system tree
-      .build();
-
-    null
-  }
-
   def createCommand(input: String) = {
     try {
       input match {
         case GitCommandFactory.GitUploadPackRE(path) => new UploadPackCommand(buildRepository(path))
-        case GitCommandFactory.GitReceivePackRE(path) => new ReceivePackCommand(null)
+        case GitCommandFactory.GitReceivePackRE(path) => new ReceivePackCommand(buildRepository(path))
       }
     } catch {
-      case e: MatchError => {
+      case e: MatchError =>
         new OutputErrorCommand("Invalid git command: " + input)
-      }
-      case e: InvalidRepositoryException => {
+      case e: InvalidRepositoryException =>
         new OutputErrorCommand(e.getMessage)
-      }
+      case e: Exception =>
+        new OutputErrorCommand("Unexpected error: " + e.getMessage)
     }
   }
 
   def buildRepository(path: String): Repository = {
-    val baseDir = new File(path)
-    val gitDir = new File(baseDir, ".git")
-    null
+    try {
+      val gitDir = new File(path)
+
+      val repository = new RepositoryBuilder()
+        .setGitDir(gitDir)
+        .setMustExist(true)
+        .setBare()
+        .build()
+
+      repository
+    } catch {
+      case e: IOException =>
+        throw new InvalidRepositoryException("'%s' does not appear to be a git repository".format(path), e)
+    }
   }
 
-  class InvalidRepositoryException(message: String) extends RuntimeException(message)
+  class InvalidRepositoryException(message: String, cause: Throwable) extends Exception(message, cause)
 
 }
