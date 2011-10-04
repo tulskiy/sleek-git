@@ -27,15 +27,12 @@ class GitCommandFactory extends CommandFactory {
     } catch {
       case e: MatchError =>
         new OutputErrorCommand("Invalid git command: " + input)
-      case e: InvalidRepositoryException =>
-        new OutputErrorCommand(e.getMessage)
       case e: Exception =>
-        new OutputErrorCommand("Unexpected error: " + e.getMessage)
+        new OutputErrorCommand("fatal: " + e.getMessage)
     }
   }
 
   def buildRepository(path: String): Repository = {
-    try {
       val gitDir = new File(path)
 
       val repository = new RepositoryBuilder()
@@ -45,12 +42,5 @@ class GitCommandFactory extends CommandFactory {
         .build()
 
       repository
-    } catch {
-      case e: IOException =>
-        throw new InvalidRepositoryException("'%s' does not appear to be a git repository".format(path), e)
-    }
   }
-
-  class InvalidRepositoryException(message: String, cause: Throwable) extends Exception(message, cause)
-
 }
