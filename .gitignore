@@ -1,2 +1,6 @@
 .idea
 *.iml
+repo/*
+Test.scala
+*.ser
+/target
