@@ -1,8 +1,8 @@
 package com.tulskiy.sleekgit.commands
 
 import org.apache.sshd.server.{ExitCallback, Command}
-import java.io.{InputStream, OutputStream}
 import org.eclipse.jgit.lib.Repository
+import java.io.{BufferedOutputStream, BufferedInputStream, InputStream, OutputStream}
 
 /**
  * Author: Denis Tulskiy
@@ -20,7 +20,7 @@ abstract class GitCommand(repository: Repository) extends Command {
 
   def setErrorStream(err: OutputStream) {this.err = err}
 
-  def setOutputStream(out: OutputStream) {this.out = out}
+  def setOutputStream(out: OutputStream) {this.out = new BufferedOutputStream(out)}
 
-  def setInputStream(in: InputStream) {this.in = in}
+  def setInputStream(in: InputStream) {this.in = new BufferedInputStream(in)}
 }
