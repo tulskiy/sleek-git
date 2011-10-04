@@ -2,6 +2,7 @@ package com.tulskiy.sleekgit.commands
 
 import org.eclipse.jgit.lib.Repository
 import org.apache.sshd.server.Environment
+import org.eclipse.jgit.transport.ReceivePack
 
 /**
  * Author: Denis Tulskiy
@@ -9,10 +10,15 @@ import org.apache.sshd.server.Environment
  */
 
 class ReceivePackCommand(repository: Repository) extends GitCommand(repository) {
+  val receivePack = new ReceivePack(repository)
+
   def start(env: Environment) {
-    err.write("Not Implemented\n".getBytes)
-    err.flush()
-    exitCallback.onExit(0)
+    new Thread(new Runnable {
+      def run() {
+        receivePack.receive(in, out, err)
+        exitCallback.onExit(0)
+      }
+    }).start()
   }
 
   def destroy() {}
