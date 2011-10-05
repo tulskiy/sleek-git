@@ -1,6 +1,6 @@
 package com.tulskiy.sleekgit
 
-import commands.{GitCommandFactory, GitProcessFactory}
+import commands.{GitCommandFactory}
 import org.apache.sshd.SshServer
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
 import org.apache.sshd.server.command.ScpCommandFactory
