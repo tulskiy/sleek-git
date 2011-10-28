@@ -2,6 +2,7 @@ package com.tulskiy.sleekgit.commands
 
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.transport.UploadPack
+
 /**
  * Author: Denis Tulskiy
  * Date: 9/12/11

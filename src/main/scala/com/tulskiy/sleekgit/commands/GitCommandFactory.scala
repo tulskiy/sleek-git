@@ -34,14 +34,14 @@ class GitCommandFactory extends CommandFactory {
   }
 
   def buildRepository(path: String): Repository = {
-      val gitDir = new File(path)
+    val gitDir = new File(path)
 
-      val repository = new RepositoryBuilder()
-        .setGitDir(gitDir)
-        .setMustExist(true)
-        .setBare()
-        .build()
+    val repository = new RepositoryBuilder()
+      .setGitDir(gitDir)
+      .setMustExist(true)
+      .setBare()
+      .build()
 
-      repository
+    repository
   }
 }
