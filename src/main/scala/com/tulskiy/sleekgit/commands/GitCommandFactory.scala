@@ -1,8 +1,8 @@
 package com.tulskiy.sleekgit.commands
 
-import org.apache.sshd.server.{CommandFactory}
+import org.apache.sshd.server.CommandFactory
 import org.eclipse.jgit.lib.{RepositoryBuilder, Repository}
-import java.io.{IOException, File}
+import java.io.File
 
 /**
  * Author: Denis Tulskiy
@@ -19,10 +19,11 @@ object GitCommandFactory {
 
 class GitCommandFactory extends CommandFactory {
   def createCommand(input: String) = {
+    import GitCommandFactory._;
     try {
       input match {
-        case GitCommandFactory.GitUploadPackRE(path) => new UploadPackCommand(buildRepository(path))
-        case GitCommandFactory.GitReceivePackRE(path) => new ReceivePackCommand(buildRepository(path))
+        case GitUploadPackRE(path) => new UploadPackCommand(buildRepository(path))
+        case GitReceivePackRE(path) => new ReceivePackCommand(buildRepository(path))
       }
     } catch {
       case e: MatchError =>
