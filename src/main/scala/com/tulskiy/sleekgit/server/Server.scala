@@ -1,16 +1,17 @@
-package com.tulskiy.sleekgit
+package com.tulskiy.sleekgit.server
 
-import commands.{GitCommandFactory}
+import auth.PublicKeyAuthenticator
 import org.apache.sshd.SshServer
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider
-import org.apache.sshd.server.command.ScpCommandFactory
-import org.apache.sshd.server.shell.ProcessShellFactory
-import org.apache.sshd.server.session.{ServerSession}
 import java.net.InetSocketAddress
 import org.apache.sshd.server._
-import auth.{UserAuthNone, UserAuthPublicKey}
 import java.security.PublicKey
+import com.weiglewilczek.slf4s.Logging
 import scala.collection.JavaConversions._
+import session.ServerSession
+import com.tulskiy.sleekgit.commands.GitCommandFactory
+import org.apache.sshd.server.auth.UserAuthPublicKey
+import org.apache.sshd.common.Session
 
 
 /**
@@ -18,7 +19,7 @@ import scala.collection.JavaConversions._
  * Date: 9/12/11
  */
 
-class GitServer {
+class Server extends Logging {
   val sshd = SshServer.setUpDefaultServer();
 
   sshd.setPort(2200)
@@ -26,12 +27,10 @@ class GitServer {
 
   sshd.setCommandFactory(new GitCommandFactory())
 
-  sshd.setUserAuthFactories(List(new UserAuthNone.Factory, new UserAuthPublicKey.Factory))
+  sshd.setUserAuthFactories(List(new UserAuthPublicKey.Factory))
 
   sshd.setFileSystemFactory(new FileSystemFactory {
-    def createFileSystemView(userName: String) = new FileSystemView {
-      def getFile(file: String) = null
-    }
+    def createFileSystemView(session: Session) = null
   })
 
   sshd.setForwardingFilter(new ForwardingFilter {
@@ -44,13 +43,10 @@ class GitServer {
     def canForwardAgent(session: ServerSession): Boolean = false
   })
 
-  sshd.setPublickeyAuthenticator(new PublickeyAuthenticator {
-    def authenticate(username: String, key: PublicKey, session: ServerSession): Boolean = {
-      true
-    }
-  })
+  sshd.setPublickeyAuthenticator(new PublicKeyAuthenticator)
 
   def start() {
+    logger.info("Starting server")
     sshd.start()
   }
 }
