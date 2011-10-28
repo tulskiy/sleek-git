@@ -2,6 +2,7 @@ package com.tulskiy.sleekgit.commands
 
 import java.io.File
 import org.eclipse.jgit.lib.{RepositoryBuilder, Repository}
+import org.eclipse.jgit.api.{Git, InitCommand}
 
 /**
  * Author: Denis Tulskiy
@@ -9,8 +10,10 @@ import org.eclipse.jgit.lib.{RepositoryBuilder, Repository}
  */
 
 object RepositoryManager {
-  def buildRepository(path: String): Repository = {
-    val gitDir = new File(path)
+  var repoPrefix = "repositories"
+  
+  def buildRepository(path: String): Git = {
+    val gitDir = new File(repoPrefix,  path)
 
     val repository = new RepositoryBuilder()
       .setGitDir(gitDir)
@@ -18,6 +21,13 @@ object RepositoryManager {
       .setBare()
       .build()
 
-    repository
+    new Git(repository)
+  }
+  
+  def createRepository(path: String): Git = {
+    val repoDir = new File(repoPrefix, path)
+    require(!repoDir.exists, "Repository already exists")
+
+    new InitCommand().setDirectory(repoDir).setBare(true).call()
   }
 }

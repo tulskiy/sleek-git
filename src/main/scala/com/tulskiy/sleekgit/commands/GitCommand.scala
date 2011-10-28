@@ -1,19 +1,19 @@
 package com.tulskiy.sleekgit.commands
 
-import org.eclipse.jgit.lib.Repository
 import java.lang.Thread
 import java.io._
 import com.weiglewilczek.slf4s.Logging
 import org.apache.sshd.server.{SessionAware, Environment, ExitCallback, Command}
 import org.apache.sshd.server.session.ServerSession
 import com.tulskiy.sleekgit.server.auth.{UserKey, User}
+import org.eclipse.jgit.api.Git
 
 /**
  * Author: Denis Tulskiy
  * Date: 9/12/11
  */
 
-abstract class GitCommand(repository: Repository) extends Command with Logging with SessionAware {
+abstract class GitCommand(repository: Git) extends Command with Logging with SessionAware {
   var exitCallback: ExitCallback = null;
   var err, out: OutputStream = null;
   var in: InputStream = null;
